@@ -1,0 +1,38 @@
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md, --markdown-linebreak-ext=markdown]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
+  - repo: local
+    hooks:
+      - id: ast-invariant-sentinel
+        name: AST Invariant Sentinel (M<=6, depth<=3, zero RFC 1918 IPs)
+        language: python
+        entry: python tools/sentinel.py --preset strict
+        files: \.py$
+        pass_filenames: true
+        additional_dependencies: []
+
+      - id: ruff
+        name: Ruff (correctness, modernization, import order)
+        language: python
+        entry: ruff check --force-exclude
+        files: \.py$
+        pass_filenames: true
+        additional_dependencies: [ruff>=0.6]
+
+      - id: ruff-format
+        name: Ruff Format
+        language: python
+        entry: ruff format --check --force-exclude
+        files: \.py$
+        pass_filenames: true
+        additional_dependencies: [ruff>=0.6]

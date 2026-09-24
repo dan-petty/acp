@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atp-spec.dev/schemas/v1/lifecycle.json",
+  "title": "ProtocolLifecycleFrames",
+  "description": "Lifecycle frames and state exchange definitions for the Agentic Transfer Protocol (ATP).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "frame_type",
+    "frame_id",
+    "timestamp_utc"
+  ],
+  "properties": {
+    "frame_type": {
+      "type": "string",
+      "enum": [
+        "ATP_PROBE_REQUEST",
+        "ATP_PROBE_RESPONSE",
+        "ATP_HANDOFF_REQUEST",
+        "ATP_HANDOFF_RESPONSE",
+        "ATP_FOLD_REQUEST",
+        "ATP_FOLD_RESPONSE",
+        "ATP_YIELD_REQUEST",
+        "ATP_YIELD_RESPONSE",
+        "ATP_PREEMPT_REQUEST"
+      ]
+    },
+    "frame_id": {
+      "type": "string",
+      "description": "Unique UUID for the protocol frame."
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "probe_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "model_id": {
+          "type": "string"
+        },
+        "context_window_total": {
+          "type": "integer"
+        },
+        "context_window_available": {
+          "type": "integer"
+        },
+        "supported_isolation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ax_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "available_tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fold_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "SUCCESS",
+            "FAILED",
+            "ESCALATED"
+          ]
+        },
+        "patch_diff": {
+          "type": "string"
+        },
+        "invariants_certified": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tokens_spent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "discovered_counterexamples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "input",
+              "expected",
+              "failing_actual"
+            ],
+            "properties": {
+              "input": {
+                "type": "string"
+              },
+              "expected": {
+                "type": "string"
+              },
+              "failing_actual": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "yield_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "cliff_category": {
+          "type": "string",
+          "enum": [
+            "CAPABILITY_CEILING",
+            "BUDGET_EXHAUSTION",
+            "CIRCULAR_DEPENDENCY",
+            "SECURITY_VIOLATION"
+          ]
+        },
+        "unresolvable_counterexample": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

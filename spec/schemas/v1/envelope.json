@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atp-spec.dev/schemas/v1/envelope.json",
+  "title": "EpistemicStateEnvelope",
+  "description": "Standardized cognitive state and capability transfer envelope for the Agentic Transfer Protocol (ATP).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "atp_version",
+    "envelope_id",
+    "traceparent",
+    "budget_leash",
+    "telos",
+    "invariant_contract",
+    "workspace_context"
+  ],
+  "properties": {
+    "atp_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$",
+      "description": "Semantic version of the Agentic Transfer Protocol."
+    },
+    "envelope_id": {
+      "type": "string",
+      "description": "Unique identifier for this epistemic state transfer envelope."
+    },
+    "traceparent": {
+      "type": "string",
+      "pattern": "^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$",
+      "description": "W3C Distributed Traceparent context for end-to-end multi-agent observability."
+    },
+    "delegation_chain": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "issuer",
+        "subject",
+        "proof"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "description": "Principal originating the task (human or sovereign orchestrator)."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Target agent receiving attenuated authority."
+        },
+        "attenuated_delegate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional downstream subagent slot."
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of cryptographically permitted capability scopes."
+        },
+        "proof": {
+          "type": "string",
+          "description": "Cryptographic delegation proof token (e.g., UCAN or Macaroon signature)."
+        }
+      }
+    },
+    "budget_leash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token_limit",
+        "max_cost_usd",
+        "max_tool_invocations"
+      ],
+      "properties": {
+        "token_limit": {
+          "type": "integer",
+          "minimum": 100,
+          "description": "Maximum token allocation across prompt and generation."
+        },
+        "max_cost_usd": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "Hard financial spend cap in USD."
+        },
+        "deadline_utc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "ISO 8601 UTC deadline for task execution."
+        },
+        "max_tool_invocations": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum tool call interactions permitted."
+        },
+        "max_retry_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3,
+          "description": "Maximum allowed recursive self-correction iterations."
+        }
+      }
+    },
+    "telos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goal",
+        "exit_criteria"
+      ],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "minLength": 5,
+          "description": "High-level teleological intent of the delegation."
+        },
+        "exit_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Falsifiable statements that must hold for task completion."
+        }
+      }
+    },
+    "invariant_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positive_invariants",
+        "negative_constraints"
+      ],
+      "properties": {
+        "positive_invariants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Invariants that must be certified as passing."
+        },
+        "negative_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Forbidden behaviors, patterns, or failure domains."
+        },
+        "cegis_counterexamples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "input",
+              "expected",
+              "failing_actual"
+            ],
+            "properties": {
+              "input": {
+                "type": "string"
+              },
+              "expected": {
+                "type": "string"
+              },
+              "failing_actual": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "description": "Accumulated counterexample cases from previous iterations."
+        }
+      }
+    },
+    "workspace_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit_base"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Target repository identifier (e.g. owner/repo)."
+        },
+        "commit_base": {
+          "type": "string",
+          "description": "Base Git commit SHA against which patches apply."
+        },
+        "working_patch": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Unified Git diff representing in-flight code modifications."
+        },
+        "active_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Qualified symbol paths involved in the active refactor."
+        }
+      }
+    },
+    "compacted_reasoning_ledger": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hypotheses_evaluated",
+          "falsified",
+          "active_approach"
+        ],
+        "properties": {
+          "hypotheses_evaluated": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "falsified": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "active_approach": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Compacted history of tested hypotheses and falsified routes."
+    }
+  }
+}
