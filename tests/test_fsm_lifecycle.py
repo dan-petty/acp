@@ -1,11 +1,11 @@
-"""Unit tests for ATP FSM lifecycle transitions and budget leash enforcement."""
+"""Unit tests for ACP FSM lifecycle transitions and budget leash enforcement."""
 
 from __future__ import annotations
 
 import pytest
 
-from atp.protocol.models import (
-    ATP_VERSION,
+from acp.protocol.models import (
+    ACP_VERSION,
     BudgetLeash,
     EpistemicEnvelope,
     InvariantContract,
@@ -13,11 +13,11 @@ from atp.protocol.models import (
     Telos,
     WorkspaceContext,
 )
-from atp.protocol.verbs import (
-    ATPInvalidStateTransitionError,
-    ATPLeashExhaustedError,
-    ATPSession,
-    ATPState,
+from acp.protocol.verbs import (
+    ACPInvalidStateTransitionError,
+    ACPLeashExhaustedError,
+    ACPSession,
+    ACPState,
     evaluate_peer_compatibility,
 )
 
@@ -29,7 +29,7 @@ def _build_test_envelope(
 ) -> EpistemicEnvelope:
     """Helper creating minimal test envelope."""
     return EpistemicEnvelope(
-        atp_version=ATP_VERSION,
+        acp_version=ACP_VERSION,
         envelope_id="fsm-test-01",
         traceparent="00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
         budget_leash=BudgetLeash(
@@ -39,24 +39,24 @@ def _build_test_envelope(
         ),
         telos=Telos(goal="FSM test", exit_criteria=["assert True"]),
         invariant_contract=InvariantContract(),
-        workspace_context=WorkspaceContext(repository="dan-petty/atp", commit_base="abcdef123"),
+        workspace_context=WorkspaceContext(repository="dan-petty/acp", commit_base="abcdef123"),
     )
 
 
 def test_session_state_transitions_and_fold():
     envelope = _build_test_envelope()
-    session = ATPSession(envelope)
+    session = ACPSession(envelope)
 
-    assert session.state == ATPState.IDLE
-    session.transition_to(ATPState.EXECUTING)
-    assert session.state == ATPState.EXECUTING
+    assert session.state == ACPState.IDLE
+    session.transition_to(ACPState.EXECUTING)
+    assert session.state == ACPState.EXECUTING
 
     fold_payload = session.fold(
         patch_diff="diff --git a/a.py b/a.py",
         certified_invariants=["invariants_pass"],
     )
     assert (session.state, fold_payload.status, fold_payload.invariants_certified) == (
-        ATPState.FOLDED,
+        ACPState.FOLDED,
         "SUCCESS",
         ["invariants_pass"],
     )
@@ -64,58 +64,58 @@ def test_session_state_transitions_and_fold():
 
 def test_session_illegal_state_transition():
     envelope = _build_test_envelope()
-    session = ATPSession(envelope)
+    session = ACPSession(envelope)
 
-    with pytest.raises(ATPInvalidStateTransitionError):
-        session.transition_to(ATPState.FOLDED)
+    with pytest.raises(ACPInvalidStateTransitionError):
+        session.transition_to(ACPState.FOLDED)
 
 
 def test_token_budget_exhaustion():
     envelope = _build_test_envelope(token_limit=500)
-    session = ATPSession(envelope)
-    session.transition_to(ATPState.EXECUTING)
+    session = ACPSession(envelope)
+    session.transition_to(ACPState.EXECUTING)
 
-    with pytest.raises(ATPLeashExhaustedError) as exc_info:
+    with pytest.raises(ACPLeashExhaustedError) as exc_info:
         session.record_usage(tokens=600)
     assert "Token limit breached" in str(exc_info.value)
 
 
 def test_cost_budget_exhaustion():
     envelope = _build_test_envelope(max_cost_usd=0.20)
-    session = ATPSession(envelope)
-    session.transition_to(ATPState.EXECUTING)
+    session = ACPSession(envelope)
+    session.transition_to(ACPState.EXECUTING)
 
-    with pytest.raises(ATPLeashExhaustedError) as exc_info:
+    with pytest.raises(ACPLeashExhaustedError) as exc_info:
         session.record_usage(cost_usd=0.25)
     assert "Cost cap breached" in str(exc_info.value)
 
 
 def test_tool_invocations_exhaustion():
     envelope = _build_test_envelope(max_tool_invocations=2)
-    session = ATPSession(envelope)
-    session.transition_to(ATPState.EXECUTING)
+    session = ACPSession(envelope)
+    session.transition_to(ACPState.EXECUTING)
 
-    with pytest.raises(ATPLeashExhaustedError) as exc_info:
+    with pytest.raises(ACPLeashExhaustedError) as exc_info:
         session.record_usage(tools_called=3)
     assert "Tool invocation limit breached" in str(exc_info.value)
 
 
 def test_suspend_and_resume_checkpoint():
     envelope = _build_test_envelope()
-    session = ATPSession(envelope)
-    session.transition_to(ATPState.EXECUTING)
+    session = ACPSession(envelope)
+    session.transition_to(ACPState.EXECUTING)
     session.record_usage(tokens=250, cost_usd=0.05, tools_called=2)
 
     checkpoint = session.suspend()
-    assert (session.state, checkpoint["tokens_consumed"]) == (ATPState.SUSPENDED, 250)
+    assert (session.state, checkpoint["tokens_consumed"]) == (ACPState.SUSPENDED, 250)
 
-    resumed = ATPSession.resume(checkpoint)
+    resumed = ACPSession.resume(checkpoint)
     assert (
         resumed.state,
         resumed.tokens_consumed,
         resumed.envelope.envelope_id,
     ) == (
-        ATPState.EXECUTING,
+        ACPState.EXECUTING,
         250,
         "fsm-test-01",
     )

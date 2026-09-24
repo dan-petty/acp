@@ -1,4 +1,4 @@
-"""Unit tests for ATP async transport layers and length-prefixed framing."""
+"""Unit tests for ACP async transport layers and length-prefixed framing."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from atp.protocol.models import ProbePayload, ProtocolFrame
-from atp.protocol.transport import (
+from acp.protocol.models import ProbePayload, ProtocolFrame
+from acp.protocol.transport import (
     FrameSerializer,
     MemoryTransport,
     UnixSocketTransport,
@@ -19,7 +19,7 @@ from atp.protocol.transport import (
 @pytest.mark.asyncio
 async def test_frame_serializer_roundtrip():
     frame = ProtocolFrame(
-        frame_type="ATP_PROBE_REQUEST",
+        frame_type="ACP_PROBE_REQUEST",
         probe_payload=ProbePayload(
             agent_id="test-agent",
             model_id="test-model",
@@ -39,7 +39,7 @@ async def test_frame_serializer_roundtrip():
         decoded.probe_payload.agent_id,
         decoded.probe_payload.ax_score,
     ) == (
-        "ATP_PROBE_REQUEST",
+        "ACP_PROBE_REQUEST",
         "test-agent",
         0.88,
     )
@@ -49,17 +49,17 @@ async def test_frame_serializer_roundtrip():
 async def test_memory_transport_duplex_communication():
     client, server = MemoryTransport.create_pair()
 
-    request_frame = ProtocolFrame(frame_type="ATP_PREEMPT_REQUEST")
+    request_frame = ProtocolFrame(frame_type="ACP_PREEMPT_REQUEST")
     await client.send_frame(request_frame)
 
     received_by_server = await server.receive_frame()
-    assert received_by_server.frame_type == "ATP_PREEMPT_REQUEST"
+    assert received_by_server.frame_type == "ACP_PREEMPT_REQUEST"
 
-    response_frame = ProtocolFrame(frame_type="ATP_FOLD_RESPONSE")
+    response_frame = ProtocolFrame(frame_type="ACP_FOLD_RESPONSE")
     await server.send_frame(response_frame)
 
     received_by_client = await client.receive_frame()
-    assert received_by_client.frame_type == "ATP_FOLD_RESPONSE"
+    assert received_by_client.frame_type == "ACP_FOLD_RESPONSE"
 
     await client.close()
     await server.close()
@@ -68,21 +68,21 @@ async def test_memory_transport_duplex_communication():
 @pytest.mark.asyncio
 async def test_unix_socket_transport_communication():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        sock_path = str(Path(tmp_dir) / "atp_test.sock")
+        sock_path = str(Path(tmp_dir) / "acp_test.sock")
         server_received: list[ProtocolFrame] = []
 
         async def _handle_client(reader, writer):
             transport = UnixSocketTransport(reader, writer)
             frame = await transport.receive_frame()
             server_received.append(frame)
-            ack = ProtocolFrame(frame_type="ATP_HANDOFF_RESPONSE")
+            ack = ProtocolFrame(frame_type="ACP_HANDOFF_RESPONSE")
             await transport.send_frame(ack)
             await transport.close()
 
         server = await asyncio.start_unix_server(_handle_client, path=sock_path)
 
         client_transport = await UnixSocketTransport.connect(sock_path)
-        send_frame = ProtocolFrame(frame_type="ATP_HANDOFF_REQUEST")
+        send_frame = ProtocolFrame(frame_type="ACP_HANDOFF_REQUEST")
         await client_transport.send_frame(send_frame)
 
         ack_frame = await client_transport.receive_frame()
@@ -97,6 +97,6 @@ async def test_unix_socket_transport_communication():
             ack_frame.frame_type,
         ) == (
             1,
-            "ATP_HANDOFF_REQUEST",
-            "ATP_HANDOFF_RESPONSE",
+            "ACP_HANDOFF_REQUEST",
+            "ACP_HANDOFF_RESPONSE",
         )

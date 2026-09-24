@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "atp"
+name = "acp"
 version = "0.1.0a1"
-description = "Agentic Transfer Protocol (ATP): Specification, Schemas, and Reference Implementation for Cognitive State Migration and Attenuated Delegation"
+description = "Agentic Communication Protocol (ACP): Specification, Schemas, and Reference Engine for Cognitive State Migration, Attenuated Delegation, and Epistemic Synchronization"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
     "pydantic>=2.7.0",
     "jsonschema>=4.20.0",
+    "cryptography>=42.0.0",
 ]
 
 [project.optional-dependencies]
@@ -40,10 +41,10 @@ lint = [
 ]
 
 [project.scripts]
-atp = "atp.cli:main"
+acp = "acp.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/atp"]
+packages = ["src/acp"]
 
 [tool.ruff]
 target-version = "py312"

@@ -1,10 +1,10 @@
-# RFC 0001: Agentic Transfer Protocol (ATP) Core Specification
+# RFC 0001: Agentic Communication Protocol (ACP) Core Specification
 
 - **Document Version**: `1.0.0-draft`
 - **Status**: Standard Proposal
 - **Date**: 2026-09-24
 - **Authors**: Dan Petty & Antigravity (Google DeepMind)
-- **Repository**: [`dan-petty/atp`](https://github.com/dan-petty/atp)
+- **Repository**: [`dan-petty/acp`](https://github.com/dan-petty/acp)
 
 ---
 
@@ -16,13 +16,13 @@ Existing application-layer protocols solve document retrieval (HTTP), data seria
 3. **Unbounded Authority**: Subagents receive ambient, unattenuated access without cryptographic budget leashes or tool boundaries.
 4. **Silent Friction Absorption**: Agents hallucinate workarounds around brittle tool schemas instead of providing structured feedback.
 
-The **Agentic Transfer Protocol (ATP)** provides a standardized, asynchronous, and cryptographically verifiable protocol for **Cognitive State Migration, Attenuated Authority Delegation, and Closed-Loop Epistemic Synchronization**.
+The **Agentic Communication Protocol (ACP)** provides a standardized, asynchronous, and cryptographically verifiable protocol for **Cognitive State Migration, Attenuated Authority Delegation, and Closed-Loop Epistemic Synchronization**.
 
 ---
 
 ## 2. The 5-Layer Architectural Stack
 
-ATP establishes five operational layers:
+ACP establishes five operational layers:
 
 ```
 +--------------------------------------------------------------------------+
@@ -30,7 +30,7 @@ ATP establishes five operational layers:
 +--------------------------------------------------------------------------+
 | 4. Epistemic State Layer (World Model, AST Symbol Graph, CEGIS Ledger)   |
 +--------------------------------------------------------------------------+
-| 3. Governance & Leash Layer (Attenuated UCAN Tokens, Budget Ceilings)    |
+| 3. Governance & Leash Layer (Attenuated Ed25519 Tokens, Budget Ceilings)  |
 +--------------------------------------------------------------------------+
 | 2. Execution Envelope Layer (Sandbox Profiles, eBPF Policies, Schemas)   |
 +--------------------------------------------------------------------------+
@@ -38,7 +38,7 @@ ATP establishes five operational layers:
 +--------------------------------------------------------------------------+
 ```
 
-1. **Transport & Framing**: Provides multiplexed bidirectional byte streams (Unix Domain Sockets, HTTP/2, QUIC) with priority out-of-band preemption frames.
+1. **Transport & Framing**: Provides multiplexed bidirectional byte streams (Unix Domain Sockets, HTTP/2, QUIC, In-Memory) with priority out-of-band preemption frames.
 2. **Execution Envelope**: Attests and enforces kernel-level sandbox containment (`ISOLATION_ROOTLESS_CONTAINER`, `ISOLATION_PROCESS_GROUP`, `NETWORK_EGRESS_AIRGAPPED`).
 3. **Governance & Leash**: Enforces cryptographic delegation chains and hard multi-dimensional resource bounds (tokens, dollars, deadlines, tool calls).
 4. **Epistemic State**: Serializes what the agent *knows and has falsified*—including AST call graphs, git patches, and CEGIS negative constraints ($C^-$).
@@ -50,23 +50,23 @@ ATP establishes five operational layers:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PROBING: ATP_PROBE_REQUEST
-    PROBING --> PEER_CERTIFIED: ATP_PROBE_RESPONSE (AX Score >= Threshold)
+    [*] --> PROBING: ACP_PROBE_REQUEST
+    PROBING --> PEER_CERTIFIED: ACP_PROBE_RESPONSE (AX Score >= Threshold)
     PROBING --> REJECTED: AX Score / Headroom Insufficient
 
-    PEER_CERTIFIED --> DELEGATED: ATP_HANDOFF_REQUEST (Attenuated Envelope)
-    DELEGATED --> EXECUTING: ATP_HANDOFF_RESPONSE (Lease Accepted)
+    PEER_CERTIFIED --> DELEGATED: ACP_HANDOFF_REQUEST (Attenuated Envelope)
+    DELEGATED --> EXECUTING: ACP_HANDOFF_RESPONSE (Lease Accepted)
 
     state EXECUTING {
         [*] --> InFlight
-        InFlight --> Suspended: ATP_SUSPEND (Checkpoint)
-        Suspended --> InFlight: ATP_RESUME
-        InFlight --> Interrupted: ATP_PREEMPT_REQUEST (Supervisor Steering)
+        InFlight --> Suspended: ACP_SUSPEND (Checkpoint)
+        Suspended --> InFlight: ACP_RESUME
+        InFlight --> Interrupted: ACP_PREEMPT_REQUEST (Supervisor Steering)
         InFlight --> CliffDetected: Capability Barrier
     }
 
-    CliffDetected --> ESCALATED: ATP_YIELD_REQUEST (Structured Counterexample)
-    EXECUTING --> FOLDED: ATP_FOLD_REQUEST (Patch Diff + Proofs)
+    CliffDetected --> ESCALATED: ACP_YIELD_REQUEST (Structured Counterexample)
+    EXECUTING --> FOLDED: ACP_FOLD_REQUEST (Patch Diff + Proofs)
     FOLDED --> [*]: Complete
     ESCALATED --> [*]: Complete
     REJECTED --> [*]: Abort
@@ -74,25 +74,25 @@ stateDiagram-v2
 
 ### Verb Definitions:
 
-- **`ATP_PROBE`**: Queries peer capabilities, context window headroom, model class, and Agent Experience score ($S_{\text{AX}}$).
-- **`ATP_HANDOFF`**: Migrates an active problem-solving state along with cryptographic delegation proofs and accumulated negative constraints.
-- **`ATP_SUSPEND` / `ATP_RESUME`**: Checkpoints an in-flight reasoning frame to content-addressed persistence, freeing runtime memory.
-- **`ATP_PREEMPT`**: Out-of-band control signal to pause or abort invalid reasoning paths without waiting for turn completion.
-- **`ATP_FOLD`**: Returns completed work upstream as an atomic patch diff, test certifications, token spend telemetry, and newly discovered invariants.
-- **`ATP_YIELD`**: Escalates to a higher-capability model tier when a structural or capability ceiling is encountered.
+- **`ACP_PROBE`**: Queries peer capabilities, context window headroom, model class, and Agent Experience score ($S_{\text{AX}}$).
+- **`ACP_HANDOFF`**: Migrates an active problem-solving state along with cryptographic delegation proofs and accumulated negative constraints.
+- **`ACP_SUSPEND` / `ACP_RESUME`**: Checkpoints an in-flight reasoning frame to content-addressed persistence, freeing runtime memory.
+- **`ACP_PREEMPT`**: Out-of-band control signal to pause or abort invalid reasoning paths without waiting for turn completion.
+- **`ACP_FOLD`**: Returns completed work upstream as an atomic patch diff, test certifications, token spend telemetry, and newly discovered invariants.
+- **`ACP_YIELD`**: Escalates to a higher-capability model tier when a structural or capability ceiling is encountered.
 
 ---
 
 ## 4. The Epistemic State Envelope (ESE)
 
-The unit of transfer in ATP is the **Epistemic State Envelope**. It replaces raw chat transcripts with a structured cognitive frame:
+The unit of transfer in ACP is the **Epistemic State Envelope**. It replaces raw chat transcripts with a structured cognitive frame:
 
 | Field | Type | Purpose |
 |---|---|---|
-| `atp_version` | String | Semantic version of protocol (`1.0.0`). |
+| `acp_version` | String | Semantic version of protocol (`1.0.0`). |
 | `envelope_id` | UUID | Unique message identifier. |
 | `traceparent` | W3C String | Distributed trace parent for multi-agent observability. |
-| `delegation_chain` | Object | Cryptographic proof (UCAN/Macaroon) with attenuated scopes. |
+| `delegation_chain` | Object | Cryptographic proof (Ed25519) with attenuated scopes. |
 | `budget_leash` | Object | Hard caps: tokens, maximum USD cost, deadline UTC, tool call limit. |
 | `telos` | Object | High-level goal and concrete falsifiable exit criteria. |
 | `invariant_contract` | Object | Positive assertions, negative constraints, and CEGIS counterexamples. |
@@ -103,7 +103,31 @@ The unit of transfer in ATP is the **Epistemic State Envelope**. It replaces raw
 
 ## 5. Security, Attenuation & Zero-Trust Invariants
 
-1. **Negative Schema Boundaries**: All tool parameters and envelope contracts enforce `additionalProperties: false`. Hallucinated or unrecognized fields are rejected at the protocol boundary.
+1. **Negative Schema Boundaries**: All tool parameters and envelope contracts enforce `additionalProperties: false` (or `extra="forbid"` in Pydantic v2). Hallucinated or unrecognized fields are rejected at the protocol boundary.
 2. **Cryptographically Attenuated Delegation**: Downstream agents can only receive a subset of the caller's rights ($R_{\text{sub}} \subseteq R_{\text{parent}}$). Privilege escalation is mathematically impossible without the root private key.
-3. **Process Group & Container Isolation**: Background tools spawned during ATP execution must run under POSIX process group isolation (`start_new_session=True`), preventing zombie grandchild processes.
+3. **Process Group & Container Isolation**: Background tools spawned during ACP execution must run under POSIX process group isolation (`start_new_session=True`), preventing zombie grandchild processes.
 4. **Zero Information Leakage**: Protocol frames must never leak private RFC 1918 hostnames, internal IPs, or cleartext credentials into persistent telemetry.
+
+---
+
+## 6. Architectural Taxonomy: IETF `draft-li-atp`, `draft-hood-agtp` & ACP
+
+To prevent industry fragmentation and disambiguate interoperability boundaries, ACP defines its architectural positioning relative to emerging internet standards:
+
+### The Multi-Layered Agent Protocol Stack:
+
+| Layer | Standard | Primary Responsibility | Wire Format / Port |
+|---|---|---|---|
+| **Layer 3/4 (Network Routing & WAN DNS)** | **IETF `draft-li-atp`** | Internet-wide agent addressing, DNS discovery (`_atp` SVCB records), ATS/ATK asymmetric identity keys, TLS WAN packet routing | Opaque packet routing |
+| **Layer 4/7 (Agent Application Wire Protocol)** | **IETF `draft-hood-independent-agtp`** | Agent-native HTTP replacement, IANA port 4480, `agtp://` URIs, 18 intent verbs (`DELEGATE`, `ESCALATE`, `CONFIRM`, etc.) | Header blocks + strict `Content-Length` framing |
+| **Layer 5/6 (Cognitive State & Epistemic Invariants)** | **ACP (Agentic Communication Protocol)** | Epistemic State Envelope (ESE), CEGIS counterexamples, Budget Leash, Anti-Amnesia Ledger, Ed25519 Authority Attenuation | `application/agtp+json` or `application/vnd.acp.envelope+json` |
+| **Layer 7 (Local Tool Registration)** | **Model Context Protocol (MCP)** | JSON-RPC stdio/SSE tool discovery and local invocation | JSON-RPC 2.0 |
+
+### Interoperability & Composable Substrates:
+- **`draft-hood-independent-agtp` explicitly specifies**:
+  *"AGTP is designed to support and carry higher-level agent frameworks (such as MCP, A2A, and ACP) as content types within its method invocations, rather than replacing them."*
+- **ACP as the Cognitive Payload**:
+  While AGTP provides the wire transport and HTTP-replacement verbs (`DELEGATE`, `ESCALATE`, `CONFIRM`), ACP provides the rigorous mathematical cognitive contracts carried within those methods (`application/agtp+json`).
+- **Full Reference Binding**:
+  This repository provides both the high-level Epistemic State & Invariant contracts (`acp`) AND native wire codecs implementing AGTP/1.0 (`acp.agtp` and `crates/acp/src/transport/agtp.rs`), standardized under [RFC 0002: AGTP Wire Protocol Bindings](./RFC-0002-AGTP-WIRE-BINDINGS.md).
+

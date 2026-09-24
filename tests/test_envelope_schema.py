@@ -1,4 +1,4 @@
-"""Unit tests for ATP Epistemic State Envelope schema and model validation."""
+"""Unit tests for ACP Epistemic State Envelope schema and model validation."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ import jsonschema
 import pytest
 from pydantic import ValidationError
 
-from atp.protocol.models import (
-    ATP_VERSION,
+from acp.protocol.models import (
+    ACP_VERSION,
     BudgetLeash,
     CEGISCounterexample,
     DelegationChain,
@@ -27,7 +27,7 @@ SCHEMA_PATH = Path(__file__).resolve().parent.parent / "spec" / "schemas" / "v1"
 def _make_sample_envelope() -> EpistemicEnvelope:
     """Construct a clean, valid sample EpistemicEnvelope."""
     return EpistemicEnvelope(
-        atp_version=ATP_VERSION,
+        acp_version=ACP_VERSION,
         envelope_id="test-env-001",
         traceparent="00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
         delegation_chain=DelegationChain(
@@ -59,10 +59,10 @@ def _make_sample_envelope() -> EpistemicEnvelope:
             ],
         ),
         workspace_context=WorkspaceContext(
-            repository="dan-petty/atp",
+            repository="dan-petty/acp",
             commit_base="88d3063c685252f4e4a79ecfb92f1b0e890e698f",
             working_patch="diff --git a/test.py b/test.py",
-            active_symbols=["atp.protocol.models::EpistemicEnvelope"],
+            active_symbols=["acp.protocol.models::EpistemicEnvelope"],
         ),
         compacted_reasoning_ledger=[
             ReasoningLedgerEntry(
@@ -100,7 +100,7 @@ def test_invalid_traceparent_rejected():
             budget_leash=BudgetLeash(token_limit=1000, max_cost_usd=0.1, max_tool_invocations=5),
             telos=Telos(goal="Test goal", exit_criteria=["exit"]),
             invariant_contract=InvariantContract(),
-            workspace_context=WorkspaceContext(repository="dan-petty/atp", commit_base="1234567"),
+            workspace_context=WorkspaceContext(repository="dan-petty/acp", commit_base="1234567"),
         )
     assert "Invalid W3C traceparent" in str(exc_info.value)
 

@@ -1,4 +1,4 @@
-"""Unit tests for ATP CLI commands."""
+"""Unit tests for ACP CLI commands."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from atp.cli import main
-from atp.protocol.models import (
-    ATP_VERSION,
+from acp.cli import main
+from acp.protocol.models import (
+    ACP_VERSION,
     BudgetLeash,
     EpistemicEnvelope,
     InvariantContract,
@@ -23,13 +23,13 @@ def _write_temp_envelope(valid: bool = True) -> Path:
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
         if valid:
             env = EpistemicEnvelope(
-                atp_version=ATP_VERSION,
+                acp_version=ACP_VERSION,
                 envelope_id="cli-test-01",
                 traceparent="00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
                 budget_leash=BudgetLeash(token_limit=8000, max_cost_usd=0.15, max_tool_invocations=5),
                 telos=Telos(goal="CLI test verification", exit_criteria=["exit 0"]),
                 invariant_contract=InvariantContract(),
-                workspace_context=WorkspaceContext(repository="dan-petty/atp", commit_base="1234567"),
+                workspace_context=WorkspaceContext(repository="dan-petty/acp", commit_base="1234567"),
             )
             tmp.write(env.model_dump_json())
         else:
@@ -40,7 +40,7 @@ def _write_temp_envelope(valid: bool = True) -> Path:
 def test_cli_version():
     with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
         code = main(["version"])
-    assert (code, f"ATP v{ATP_VERSION}" in mock_stdout.getvalue()) == (0, True)
+    assert (code, f"ACP v{ACP_VERSION}" in mock_stdout.getvalue()) == (0, True)
 
 
 def test_cli_validate_success():
@@ -80,3 +80,9 @@ def test_cli_inspect_success():
         )
     finally:
         path.unlink()
+
+
+def test_cli_mcp():
+    with patch("acp.mcp.server.run_stdio_server") as mock_server:
+        code = main(["mcp"])
+    assert (code, mock_server.called) == (0, True)

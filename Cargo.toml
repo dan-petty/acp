@@ -1,3 +1,3 @@
 [workspace]
-members = ["crates/atp"]
+members = ["crates/acp"]
 resolver = "2"

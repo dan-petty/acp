@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://atp-spec.dev/schemas/v1/lifecycle.json",
+  "$id": "https://acp-spec.dev/schemas/v1/lifecycle.json",
   "title": "ProtocolLifecycleFrames",
-  "description": "Lifecycle frames and state exchange definitions for the Agentic Transfer Protocol (ATP).",
+  "description": "Lifecycle frames and state exchange definitions for the Agentic Communication Protocol (ACP).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,15 +14,15 @@
     "frame_type": {
       "type": "string",
       "enum": [
-        "ATP_PROBE_REQUEST",
-        "ATP_PROBE_RESPONSE",
-        "ATP_HANDOFF_REQUEST",
-        "ATP_HANDOFF_RESPONSE",
-        "ATP_FOLD_REQUEST",
-        "ATP_FOLD_RESPONSE",
-        "ATP_YIELD_REQUEST",
-        "ATP_YIELD_RESPONSE",
-        "ATP_PREEMPT_REQUEST"
+        "ACP_PROBE_REQUEST",
+        "ACP_PROBE_RESPONSE",
+        "ACP_HANDOFF_REQUEST",
+        "ACP_HANDOFF_RESPONSE",
+        "ACP_FOLD_REQUEST",
+        "ACP_FOLD_RESPONSE",
+        "ACP_YIELD_REQUEST",
+        "ACP_YIELD_RESPONSE",
+        "ACP_PREEMPT_REQUEST"
       ]
     },
     "frame_id": {

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://atp-spec.dev/schemas/v1/envelope.json",
+  "$id": "https://acp-spec.dev/schemas/v1/envelope.json",
   "title": "EpistemicStateEnvelope",
-  "description": "Standardized cognitive state and capability transfer envelope for the Agentic Transfer Protocol (ATP).",
+  "description": "Standardized cognitive state and capability transfer envelope for the Agentic Communication Protocol (ACP).",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "atp_version",
+    "acp_version",
     "envelope_id",
     "traceparent",
     "budget_leash",
@@ -15,10 +15,10 @@
     "workspace_context"
   ],
   "properties": {
-    "atp_version": {
+    "acp_version": {
       "type": "string",
       "pattern": "^1\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$",
-      "description": "Semantic version of the Agentic Transfer Protocol."
+      "description": "Semantic version of the Agentic Communication Protocol."
     },
     "envelope_id": {
       "type": "string",
