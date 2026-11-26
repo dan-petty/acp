@@ -34,7 +34,7 @@ In accordance with *`draft-hood-independent-agtp`*:
 #### A. Task Delegation (`DELEGATE` Method):
 ```http
 DELEGATE /v1/tasks/refactor AGTP/1.0
-Host: worker.local:4480
+Host: agent.example.com:4480
 Agent-ID: agent:orchestrator
 Principal-ID: user:dan@example.com
 Authority-Scope: repo:read,repo:write,test:run
@@ -123,5 +123,5 @@ Content-Length: 412
 ## 5. Reference Implementations
 
 This repository provides certified, polyglot reference implementations of the AGTP wire protocol:
-- **Python**: [`acp.protocol.agtp_wire`](file:///workspaces/devops-cli/repos/dan-petty/acp/src/acp/protocol/agtp_wire.py) and [`AGTPTransport`](file:///workspaces/devops-cli/repos/dan-petty/acp/src/acp/protocol/transport.py)
-- **Rust**: [`crates/acp/src/transport/agtp.rs`](file:///workspaces/devops-cli/repos/dan-petty/acp/crates/acp/src/transport/agtp.rs)
+- **Python**: [`acp.protocol.agtp_wire`](../../src/acp/protocol/agtp_wire.py) and [`AGTPTransport`](../../src/acp/protocol/transport.py)
+- **Rust**: [`crates/acp/src/transport/agtp.rs`](../../crates/acp/src/transport/agtp.rs)

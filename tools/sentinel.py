@@ -266,7 +266,7 @@ def load_toml_config(config_path: Path | None = None) -> dict[str, Any]:
         return {}
     try:
         data = tomllib.loads(target.read_text(encoding="utf-8"))
-    except (OSError, tomllib.TOMLDecodeError):
+    except OSError, tomllib.TOMLDecodeError:
         return {}
     if target.name == "pyproject.toml":
         tool_section = data.get("tool", {})
@@ -693,7 +693,7 @@ def _header_tokens(source: str) -> Iterator[tokenize.TokenInfo]:
             lambda token: token.start[0] <= WAIVER_HEADER_LINE_LIMIT,
             tokenize.generate_tokens(io.StringIO(source).readline),
         )
-    except (tokenize.TokenError, IndentationError, SyntaxError):
+    except tokenize.TokenError, IndentationError, SyntaxError:
         return
 
 
@@ -874,7 +874,7 @@ def _dedupe_key(path: Path) -> Path:
     """Return a canonical identity for path, tolerating unresolvable symlinks."""
     try:
         return path.resolve()
-    except (OSError, RuntimeError):
+    except OSError, RuntimeError:
         return path
 
 

@@ -1,6 +1,6 @@
 # AGENTS.md — AI Agent Instructions & Engineering Best Practices
 
-This document provides foundational context, architectural principles, and operational best practices for AI coding assistants working on the `dan-petty/atp` codebase.
+This document provides foundational context, architectural principles, and operational best practices for AI coding assistants working on the `dan-petty/acp` codebase.
 
 ---
 
@@ -33,7 +33,7 @@ Before committing or pushing any change, execute the full local validation suite
 
 ```bash
 # 1. Run unit test suite with coverage enforcement
-python3 -m pytest tests/ -v --cov=src/atp --cov-report=term-missing --cov-fail-under=90
+python3 -m pytest tests/ -v --cov=src/acp --cov-report=term-missing --cov-fail-under=90
 
 # 2. Verify architectural invariants
 python3 tools/sentinel.py src/ tools/ tests/ --preset strict

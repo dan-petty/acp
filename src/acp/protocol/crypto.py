@@ -61,7 +61,7 @@ def verify_delegation(chain: DelegationChain, issuer_public_key_hex: str) -> boo
         )
         public_key.verify(bytes.fromhex(chain.proof), payload)
         return True
-    except (InvalidSignature, ValueError):
+    except InvalidSignature, ValueError:
         return False
 
 
