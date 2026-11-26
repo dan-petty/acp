@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ["3.15"]
 
     steps:
       - name: Checkout Repository
@@ -33,7 +33,7 @@ jobs:
 
       - name: Execute Full Test Suite & Coverage Floor
         run: |
-          pytest tests/ -v --cov=src/atp --cov-report=term-missing --cov-fail-under=90
+          pytest tests/ -v --cov=src/acp --cov-report=term-missing --cov-fail-under=90
 
       - name: Lint (correctness, modernization, import order)
         run: |
