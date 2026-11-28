@@ -27,7 +27,7 @@ repos:
         entry: ruff check --force-exclude
         files: \.py$
         pass_filenames: true
-        additional_dependencies: [ruff>=0.6]
+        additional_dependencies: [ruff>=0.6.9]
 
       - id: ruff-format
         name: Ruff Format
@@ -35,4 +35,4 @@ repos:
         entry: ruff format --check --force-exclude
         files: \.py$
         pass_filenames: true
-        additional_dependencies: [ruff>=0.6]
+        additional_dependencies: [ruff>=0.6.9]
